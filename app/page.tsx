@@ -52,12 +52,33 @@ export default function Home() {
       </section>
 
       {/* Entry Cards */}
-      <section className="w-full max-w-6xl mx-auto px-4 -mt-12 z-10 mb-20 relative">
+      <section className="w-full max-w-6xl mx-auto px-4 -mt-12 z-10 mb-20 relative space-y-6">
+        
+        {/* Featured Card - OneBridge */}
+        <motion.div variants={item} initial="hidden" animate="show" className="w-full" transition={{ delay: 0.1 }}>
+            <Link 
+              href="/onebridge" 
+              className="flex flex-col md:flex-row items-center gap-6 bg-white dark:bg-slate-800 rounded-xl border border-blue-200 dark:border-blue-900/50 p-8 shadow-xl hover:shadow-2xl hover:-translate-y-1 hover:border-blue-500 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 active:scale-[0.98]"
+            >
+              <div className="w-20 h-20 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-105 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300">
+                 <ArrowRightLeft className="w-10 h-10" aria-hidden="true" />
+              </div>
+              <div className="flex-1 text-center md:text-left">
+                <h2 className="text-2xl md:text-3xl font-bold text-navy dark:text-white mb-2">Step 1: OneBridge Classification</h2>
+                <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed max-w-3xl">Required first step for all Transformation and AI Initiatives. Answer a few questions to find your execution route, and automatically map your operational characteristics into the AI Assessment.</p>
+              </div>
+              <div className="hidden md:flex shrink-0 items-center justify-center">
+                 <div className="bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md group-hover:bg-blue-600 transition-colors">Start routing →</div>
+              </div>
+            </Link>
+        </motion.div>
+
+        {/* Secondary Cards */}
         <motion.div 
           variants={container}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
           {/* Card 1 */}
           <motion.div variants={item} className="h-full">
@@ -68,8 +89,8 @@ export default function Home() {
               <div className="w-14 h-14 rounded-full bg-teal-light/20 flex items-center justify-center text-teal mb-6 group-hover:scale-110 group-hover:bg-teal group-hover:text-white transition-all duration-300">
                  <Rocket className="w-7 h-7" aria-hidden="true" />
               </div>
-              <h2 className="text-xl font-bold text-navy dark:text-white mb-3">Start a New AI Proposal</h2>
-              <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed flex-grow">Classify your use case and find the exact approval route and evidence requirements.</p>
+              <h2 className="text-xl font-bold text-navy dark:text-white mb-3">AI Proposal Assessment</h2>
+              <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed flex-grow">Classify your AI use case risk and find your required evidence checklist.</p>
             </Link>
           </motion.div>
 
@@ -80,8 +101,8 @@ export default function Home() {
               <div className="w-14 h-14 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 mb-6 grayscale">
                  <Search className="w-7 h-7" aria-hidden="true" />
               </div>
-              <h2 className="text-xl font-bold text-slate-500 dark:text-slate-400 mb-3">Explore Active Projects</h2>
-              <p className="text-slate-500 dark:text-slate-500 text-sm leading-relaxed flex-grow">Search the AI Registry to see what projects are underway across the organisation.</p>
+              <h2 className="text-xl font-bold text-slate-500 dark:text-slate-400 mb-3">Active Projects</h2>
+              <p className="text-slate-500 dark:text-slate-500 text-sm leading-relaxed flex-grow">Search the AI Registry to see what projects are underway.</p>
             </div>
           </motion.div>
 
@@ -96,20 +117,6 @@ export default function Home() {
               </div>
               <h2 className="text-xl font-bold text-navy dark:text-white mb-3">Report a Concern</h2>
               <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed flex-grow">Flag an issue, incident, or governance concern regarding an active AI deployment.</p>
-            </Link>
-          </motion.div>
-
-          {/* Card 4 — OneBridge Routing */}
-          <motion.div variants={item} className="h-full">
-            <Link 
-              href="/onebridge" 
-              className="flex flex-col h-full bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-8 shadow-md hover:shadow-xl hover:-translate-y-1 hover:border-b-4 hover:border-b-blue-500 hover:border-x-blue-500/50 hover:border-t-blue-500/50 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 active:scale-95"
-            >
-              <div className="w-14 h-14 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300">
-                 <ArrowRightLeft className="w-7 h-7" aria-hidden="true" />
-              </div>
-              <h2 className="text-xl font-bold text-navy dark:text-white mb-3">OneBridge Routing</h2>
-              <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed flex-grow">Not sure if your transformation initiative should go to OneBridge? Find the right route in minutes.</p>
             </Link>
           </motion.div>
         </motion.div>

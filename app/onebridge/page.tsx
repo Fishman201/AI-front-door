@@ -598,13 +598,26 @@ function OutcomeScreen({ form, route, rejectionReason }: { form: FormData; route
       </div>
 
       {/* Action buttons */}
-      <div className="flex flex-wrap gap-4">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 bg-teal hover:bg-teal-light text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2 active:scale-95"
-        >
-          Return to AI Front Door
-        </Link>
+      <div className="flex flex-wrap gap-4 mt-8">
+        {isAI ? (
+          <button
+            onClick={() => {
+                const mapping = generateAIMapping(form);
+                sessionStorage.setItem('ai-front-door-prefill', JSON.stringify(mapping));
+                window.location.href = '/assess';
+            }}
+            className="inline-flex items-center gap-2 bg-teal hover:bg-teal-light text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2 active:scale-95"
+          >
+            Continue to AI Assessment →
+          </button>
+        ) : (
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 active:scale-95"
+          >
+            Return to Dashboard
+          </Link>
+        )}
         <button
           onClick={() => window.print()}
           className="inline-flex items-center gap-2 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium px-6 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
@@ -676,6 +689,77 @@ function onebridgeTriage(form: FormData): { status: 'ai-steering' | 'tpmo' | 're
   }
 
   return { status: 'tpmo' };
+}
+
+// ─── AI Mapping Heuristic (Mock LLM) ──────────────────────────────────────────
+
+export function generateAIMapping(form: FormData): Record<string, string> {
+  const combinedText = `
+    ${form.initiativeTitle} ${form.initiativeOverview} 
+    ${form.strategicPriorities} ${form.operationalTechnologyImpact} 
+    ${form.scopeAndBusinessImpact} ${form.regulatoryEthicalCyberRisks} 
+    ${form.operationalDisruptionRisk} ${form.changeManagementImpact}
+    ${form.deliveryPlan} ${form.businessCaseSummary}
+  `.toLowerCase();
+
+  const answers: Record<string, string> = {};
+
+  // Entry: Always a new proposal from OneBridge
+  answers['entry'] = 'new-proposal';
+
+  // Why AI
+  if (combinedText.includes('outperforms') || combinedText.includes('roi') || form.kpisLongTermRoi?.length > 50) {
+    answers['why-ai'] = 'clear-advantage';
+  } else {
+    answers['why-ai'] = 'exploring';
+  }
+
+  // Data Sensitivity
+  if (combinedText.includes('personal') || combinedText.includes('gdpr') || combinedText.includes('classified') || combinedText.includes('sensitive') || combinedText.includes('customer data')) {
+    answers['data-sensitivity'] = 'sensitive';
+  } else if (combinedText.includes('internal') || combinedText.includes('controlled') || combinedText.includes('employee')) {
+    answers['data-sensitivity'] = 'controlled';
+  } else {
+    answers['data-sensitivity'] = 'public-internal';
+  }
+
+  // Decision Influence
+  if (combinedText.includes('determine') || combinedText.includes('automate decision') || combinedText.includes('final say')) {
+    answers['decision-influence'] = 'determines-outcomes';
+  } else if (combinedText.includes('inform') || combinedText.includes('support decision') || combinedText.includes('recommend')) {
+    answers['decision-influence'] = 'informs-decisions';
+  } else {
+    answers['decision-influence'] = 'support-only';
+  }
+
+  // Audience Reliance
+  if (combinedText.includes('customer') || combinedText.includes('external') || combinedText.includes('public') || combinedText.includes('supplier')) {
+    answers['audience-reliance'] = 'external';
+  } else if (form.scopeLevel === 'global' || combinedText.includes('operational teams') || combinedText.includes('functions')) {
+    answers['audience-reliance'] = 'internal-ops';
+  } else {
+    answers['audience-reliance'] = 'internal-aid';
+  }
+
+  // Autonomy Action
+  if (combinedText.includes('autonomous') || combinedText.includes('without human') || combinedText.includes('self-initiate')) {
+    answers['autonomy-action'] = 'autonomous-actions';
+  } else if (combinedText.includes('bounded') || combinedText.includes('trigger') || combinedText.includes('action')) {
+    answers['autonomy-action'] = 'bounded-actions';
+  } else {
+    answers['autonomy-action'] = 'content-for-review';
+  }
+
+  // Domain Sensitivity
+  if (combinedText.includes('safety') || combinedText.includes('defence') || combinedText.includes('military') || combinedText.includes('regulated') || combinedText.includes('security')) {
+    answers['domain-sensitivity'] = 'restricted-domain';
+  } else if (combinedText.includes('operation') || combinedText.includes('engineering') || combinedText.includes('infrastructure')) {
+    answers['domain-sensitivity'] = 'operationally-relevant';
+  } else {
+    answers['domain-sensitivity'] = 'no-trigger';
+  }
+
+  return answers;
 }
 
 // ─── Nav buttons ──────────────────────────────────────────────────────────────

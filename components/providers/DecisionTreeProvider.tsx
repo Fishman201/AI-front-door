@@ -25,7 +25,8 @@ type Action =
   | { type: 'BACK' }
   | { type: 'RESET' }
   | { type: 'JUMP_TO'; nodeId: string }
-  | { type: 'SET_RESTRICTED_ACKNOWLEDGED' };
+  | { type: 'SET_RESTRICTED_ACKNOWLEDGED' }
+  | { type: 'LOAD_PREFILL'; answers: Record<string, string> };
 
 const initialState: State = {
   currentNodeId: 'entry',
@@ -156,6 +157,13 @@ function reducer(state: State, action: Action): State {
          classification,
        }
     }
+    case 'LOAD_PREFILL': {
+      return {
+        ...state,
+        answers: action.answers,
+        entryType: action.answers['entry'] || null,
+      };
+    }
     default:
       return state;
   }
@@ -168,6 +176,20 @@ const DecisionTreeContext = createContext<{
 
 export function DecisionTreeProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  // Ingest AI Map prefill from OneBridge if available
+  useEffect(() => {
+    const prefill = sessionStorage.getItem('ai-front-door-prefill');
+    if (prefill) {
+      try {
+        const answers = JSON.parse(prefill);
+        dispatch({ type: 'LOAD_PREFILL', answers });
+        sessionStorage.removeItem('ai-front-door-prefill');
+      } catch (e) {
+        console.error('Failed to parse prefill', e);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     // Only trigger when isComplete first becomes true.
