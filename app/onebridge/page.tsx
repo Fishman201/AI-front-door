@@ -604,6 +604,23 @@ function OutcomeScreen({ form, route, rejectionReason }: { form: FormData; route
             onClick={() => {
                 const mapping = generateAIMapping(form);
                 sessionStorage.setItem('ai-front-door-prefill', JSON.stringify(mapping));
+                // Also persist the full OneBridge form so the PDF can include it
+                sessionStorage.setItem('onebridge-submission', JSON.stringify({
+                  initiativeTitle: form.initiativeTitle,
+                  initiativeOverview: form.initiativeOverview,
+                  strategicPriorities: form.strategicPriorities,
+                  scopeLevel: form.scopeLevel,
+                  scopeAndBusinessImpact: form.scopeAndBusinessImpact,
+                  totalInvestmentEstimate: form.totalInvestmentEstimate,
+                  benefitType: form.benefitType,
+                  financialBenefits: form.financialBenefits,
+                  nonFinancialBenefits: form.nonFinancialBenefits,
+                  regulatoryEthicalCyberRisks: form.regulatoryEthicalCyberRisks,
+                  deliveryPlan: form.deliveryPlan,
+                  kpisLongTermRoi: form.kpisLongTermRoi,
+                  executiveSponsorName: form.executiveSponsorName,
+                  executiveSponsorRole: form.executiveSponsorRole,
+                }));
                 window.location.href = '/assess';
             }}
             className="inline-flex items-center gap-2 bg-teal hover:bg-teal-light text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2 active:scale-95"

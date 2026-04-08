@@ -18,8 +18,26 @@ type ResultData = {
   entryType: string | null;
 }
 
+type OneBridgeSubmission = {
+  initiativeTitle?: string;
+  initiativeOverview?: string;
+  strategicPriorities?: string;
+  scopeLevel?: string;
+  scopeAndBusinessImpact?: string;
+  totalInvestmentEstimate?: string;
+  benefitType?: string;
+  financialBenefits?: string;
+  nonFinancialBenefits?: string;
+  regulatoryEthicalCyberRisks?: string;
+  deliveryPlan?: string;
+  kpisLongTermRoi?: string;
+  executiveSponsorName?: string;
+  executiveSponsorRole?: string;
+}
+
 function ResultsPage() {
   const [data, setData] = useState<ResultData | null>(null);
+  const [oneBridgeData, setOneBridgeData] = useState<OneBridgeSubmission | null>(null);
   const [noData, setNoData] = useState(false);
   const [showAnswers, setShowAnswers] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -61,6 +79,18 @@ function ResultsPage() {
     // a spinner that never resolves.
     setNoData(true);
   }, [encParam]);
+
+  // Load OneBridge submission if present
+  useEffect(() => {
+    const stored = sessionStorage.getItem('onebridge-submission');
+    if (stored) {
+      try {
+        setOneBridgeData(JSON.parse(stored));
+      } catch {
+        // ignore malformed data
+      }
+    }
+  }, []);
 
   // Issue 1 fix: show a proper "no assessment found" screen instead of an
   // infinite loading spinner.
@@ -461,7 +491,7 @@ function ResultsPage() {
         </ol>
 
         <div className="flex flex-wrap gap-4 pt-4 border-t border-slate-700/50">
-          <DownloadPDF classification={classification} answers={answers} />
+          <DownloadPDF classification={classification} answers={answers} oneBridgeData={oneBridgeData ?? undefined} />
           
           <button 
             onClick={() => generateExportJson(answers, classification, data.entryType)}

@@ -8,6 +8,23 @@ import { TreeNode } from '@/types/decision-tree';
 
 const treeData = treeDataRaw as { nodes: TreeNode[] };
 
+type OneBridgeSubmission = {
+  initiativeTitle?: string;
+  initiativeOverview?: string;
+  strategicPriorities?: string;
+  scopeLevel?: string;
+  scopeAndBusinessImpact?: string;
+  totalInvestmentEstimate?: string;
+  benefitType?: string;
+  financialBenefits?: string;
+  nonFinancialBenefits?: string;
+  regulatoryEthicalCyberRisks?: string;
+  deliveryPlan?: string;
+  kpisLongTermRoi?: string;
+  executiveSponsorName?: string;
+  executiveSponsorRole?: string;
+};
+
 const styles = StyleSheet.create({
   page: { padding: 40, fontFamily: 'Helvetica', backgroundColor: '#ffffff' },
   header: { fontSize: 24, color: '#1B2A4A', marginBottom: 10, fontWeight: 'bold' },
@@ -31,7 +48,7 @@ const styles = StyleSheet.create({
   footer: { position: 'absolute', bottom: 30, left: 40, right: 40, fontSize: 8, color: '#94a3b8', textAlign: 'center', borderTop: '1px solid #e2e8f0', paddingTop: 10 },
 });
 
-const MyDoc = ({ classification, answers }: { classification: ClassificationResult, answers: Record<string, string> }) => (
+const MyDoc = ({ classification, answers, oneBridgeData }: { classification: ClassificationResult, answers: Record<string, string>, oneBridgeData?: OneBridgeSubmission }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <Text style={styles.header}>AI Front Door — Classification Summary</Text>
@@ -119,16 +136,87 @@ const MyDoc = ({ classification, answers }: { classification: ClassificationResu
          <Text style={styles.footer}>Generated from the AI Front Door | This classification is guidance only. All approvals must follow the formal governance process. | Page 4</Text>
       </Page>
     )}
+
+    {oneBridgeData && oneBridgeData.initiativeTitle && (
+      <Page size="A4" style={styles.page}>
+        <Text style={styles.header}>OneBridge Submission — Initiative Summary</Text>
+        <Text style={styles.subheader}>Linked from OneBridge triage completed prior to AI Assessment</Text>
+        <View style={styles.rule} />
+
+        {oneBridgeData.initiativeTitle && (
+          <View style={[styles.box, { marginBottom: 12 }]}>
+            <Text style={styles.boldText}>Initiative Title</Text>
+            <Text style={styles.normalText}>{oneBridgeData.initiativeTitle}</Text>
+          </View>
+        )}
+
+        {oneBridgeData.executiveSponsorName && (
+          <View style={styles.tableRow}>
+            <Text style={[styles.col1, styles.colBold]}>Executive Sponsor</Text>
+            <Text style={styles.col2}>{oneBridgeData.executiveSponsorName}{oneBridgeData.executiveSponsorRole ? ` — ${oneBridgeData.executiveSponsorRole}` : ''}</Text>
+          </View>
+        )}
+        {oneBridgeData.scopeLevel && (
+          <View style={styles.tableRow}>
+            <Text style={[styles.col1, styles.colBold]}>Scope Level</Text>
+            <Text style={styles.col2}>{oneBridgeData.scopeLevel.charAt(0).toUpperCase() + oneBridgeData.scopeLevel.slice(1)}</Text>
+          </View>
+        )}
+        {oneBridgeData.totalInvestmentEstimate && (
+          <View style={styles.tableRow}>
+            <Text style={[styles.col1, styles.colBold]}>Investment Estimate</Text>
+            <Text style={styles.col2}>{oneBridgeData.totalInvestmentEstimate}</Text>
+          </View>
+        )}
+        {oneBridgeData.benefitType && (
+          <View style={styles.tableRow}>
+            <Text style={[styles.col1, styles.colBold]}>Benefit Type</Text>
+            <Text style={styles.col2}>{oneBridgeData.benefitType.replace(/-/g, ' ')}</Text>
+          </View>
+        )}
+        {oneBridgeData.initiativeOverview && (
+          <View style={{ marginTop: 12 }}>
+            <Text style={styles.boldText}>Initiative Overview</Text>
+            <Text style={styles.normalText}>{oneBridgeData.initiativeOverview}</Text>
+          </View>
+        )}
+        {oneBridgeData.strategicPriorities && (
+          <View style={{ marginTop: 10 }}>
+            <Text style={styles.boldText}>Strategic Priorities</Text>
+            <Text style={styles.normalText}>{oneBridgeData.strategicPriorities}</Text>
+          </View>
+        )}
+        {oneBridgeData.financialBenefits && (
+          <View style={{ marginTop: 10 }}>
+            <Text style={styles.boldText}>Financial Benefits</Text>
+            <Text style={styles.normalText}>{oneBridgeData.financialBenefits}</Text>
+          </View>
+        )}
+        {oneBridgeData.regulatoryEthicalCyberRisks && (
+          <View style={{ marginTop: 10 }}>
+            <Text style={styles.boldText}>Regulatory, Ethical & Cyber Risks</Text>
+            <Text style={styles.normalText}>{oneBridgeData.regulatoryEthicalCyberRisks}</Text>
+          </View>
+        )}
+        {oneBridgeData.kpisLongTermRoi && (
+          <View style={{ marginTop: 10 }}>
+            <Text style={styles.boldText}>KPIs & Long-Term ROI</Text>
+            <Text style={styles.normalText}>{oneBridgeData.kpisLongTermRoi}</Text>
+          </View>
+        )}
+        <Text style={styles.footer}>Generated from the AI Front Door | OneBridge Submission Data | Classification: UNCLASSIFIED</Text>
+      </Page>
+    )}
   </Document>
 );
 
-export default function PDFDocumentBuilder({ classification, answers }: { classification: ClassificationResult, answers: Record<string, string> }) {
+export default function PDFDocumentBuilder({ classification, answers, oneBridgeData }: { classification: ClassificationResult, answers: Record<string, string>, oneBridgeData?: OneBridgeSubmission }) {
   // Issue 9 fix: memoize the document element so @react-pdf/renderer doesn't
   // re-run its expensive layout engine on every parent render (e.g., when
   // showAnswers toggles on the results page). Only rebuilds when data changes.
   const doc = useMemo(
-    () => <MyDoc classification={classification} answers={answers} />,
-    [classification, answers]
+    () => <MyDoc classification={classification} answers={answers} oneBridgeData={oneBridgeData} />,
+    [classification, answers, oneBridgeData]
   );
 
   return (
