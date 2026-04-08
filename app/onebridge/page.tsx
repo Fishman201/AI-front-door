@@ -15,6 +15,7 @@ interface FormData {
   strategicPriorities: string;
   operationalTechnologyImpact: string;
   scopeAndBusinessImpact: string;
+  scopeLevel: 'global' | 'sector' | 'local' | '';
 
   // Section 2 — Investment & benefits
   totalInvestmentEstimate: string;
@@ -42,6 +43,8 @@ interface FormData {
   executiveSponsorName: string;
   executiveSponsorRole: string;
   sponsorEndorsementConfirmed: boolean;
+  hasPassedGate3: boolean;
+  hasPID: boolean;
 
   // AI decision gate
   involvesAI: 'yes' | 'no' | '';
@@ -52,7 +55,8 @@ type Section = 1 | 2 | 3 | 4 | 5 | 'gate' | 'outcome';
 interface State {
   currentSection: Section;
   form: FormData;
-  route: 'ai-steering' | 'tpmo' | null;
+  route: 'ai-steering' | 'tpmo' | 'rejected' | null;
+  rejectionReason: string;
   submitted: boolean;
 }
 
@@ -60,13 +64,13 @@ type Action =
   | { type: 'UPDATE_FIELD'; field: keyof FormData; value: string | boolean }
   | { type: 'NEXT_SECTION' }
   | { type: 'PREV_SECTION' }
-  | { type: 'SET_ROUTE'; route: 'ai-steering' | 'tpmo' }
+  | { type: 'SET_ROUTE'; route: 'ai-steering' | 'tpmo' | 'rejected'; reason?: string }
   | { type: 'SUBMIT' }
   | { type: 'RESET' };
 
 const EMPTY_FORM: FormData = {
   initiativeTitle: '', initiativeOverview: '', strategicPriorities: '',
-  operationalTechnologyImpact: '', scopeAndBusinessImpact: '',
+  operationalTechnologyImpact: '', scopeAndBusinessImpact: '', scopeLevel: '',
   totalInvestmentEstimate: '', fundingAvailability: '', irrNpvRoi: '',
   financialBenefits: '', nonFinancialBenefits: '', benefitType: '',
   regulatoryEthicalCyberRisks: '', operationalDisruptionRisk: '',
@@ -74,7 +78,7 @@ const EMPTY_FORM: FormData = {
   deliveryPlan: '', roadmapSummary: '', businessCaseSummary: '',
   deliverablesDurationPhasing: '', kpisLongTermRoi: '',
   executiveSponsorName: '', executiveSponsorRole: '',
-  sponsorEndorsementConfirmed: false,
+  sponsorEndorsementConfirmed: false, hasPassedGate3: false, hasPID: false,
   involvesAI: '',
 };
 
@@ -99,11 +103,11 @@ function reducer(state: State, action: Action): State {
     case 'PREV_SECTION':
       return { ...state, currentSection: prevSection(state.currentSection) };
     case 'SET_ROUTE':
-      return { ...state, route: action.route, currentSection: 'outcome' };
+      return { ...state, route: action.route, rejectionReason: action.reason || '', currentSection: 'outcome' };
     case 'SUBMIT':
       return { ...state, submitted: true };
     case 'RESET':
-      return { currentSection: 1, form: EMPTY_FORM, route: null, submitted: false };
+      return { currentSection: 1, form: EMPTY_FORM, route: null, rejectionReason: '', submitted: false };
     default:
       return state;
   }
@@ -216,6 +220,22 @@ function Section1({ form, dispatch }: { form: FormData; dispatch: React.Dispatch
       </Field>
       <Field label="Operational technology impact" hint="Will this initiative affect any operational technology, control systems, or critical infrastructure?">
         <TextArea value={form.operationalTechnologyImpact} onChange={upd('operationalTechnologyImpact')} placeholder="Describe any OT impact, or state 'None identified'..." />
+      </Field>
+      <Field label="Scope level" required hint="Is this a global enterprise-wide initiative, sector-specific, or local?">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-1">
+          {(['global', 'sector', 'local'] as const).map(opt => (
+            <button
+              key={opt}
+              onClick={() => dispatch({ type: 'UPDATE_FIELD', field: 'scopeLevel', value: opt })}
+              className={`capitalize text-center p-3 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2
+                ${form.scopeLevel === opt
+                  ? 'border-teal bg-teal/10 dark:bg-teal/20 text-teal dark:text-teal-light font-bold'
+                  : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white hover:border-teal/50'}`}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
       </Field>
       <Field label="Scope and business impact" required hint="What is in scope? What business units, functions, or sectors will be affected?">
         <TextArea value={form.scopeAndBusinessImpact} onChange={upd('scopeAndBusinessImpact')} rows={4} placeholder="Define the scope and expected business impact..." />
@@ -344,9 +364,33 @@ function Section5({ form, dispatch }: { form: FormData; dispatch: React.Dispatch
         title="Sponsor & governance"
         subtitle="Confirm executive sponsorship. All initiatives submitted via OneBridge must have a named executive sponsor."
       />
-      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-xl p-4 text-sm text-amber-800 dark:text-amber-300">
-        <p className="font-semibold mb-1">Maturity requirement</p>
-        <p>Your initiative must have passed Gate 3 of the Babcock transformation lifecycle and be supported by a PID or early-stage business case before submission. Initiatives that do not meet this threshold will not be progressed.</p>
+      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-xl p-5 text-sm text-amber-800 dark:text-amber-300 space-y-4">
+        <div>
+          <p className="font-bold text-base mb-1">Maturity requirements</p>
+          <p>Your initiative must have passed Gate 3 of the Babcock transformation lifecycle and be supported by a PID or early-stage business case before submission.</p>
+        </div>
+        <div className="space-y-2">
+          <button
+            onClick={() => dispatch({ type: 'UPDATE_FIELD', field: 'hasPassedGate3', value: !form.hasPassedGate3 })}
+            className="flex items-center gap-3 w-full text-left focus:outline-none"
+          >
+            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors
+              ${form.hasPassedGate3 ? 'bg-amber-600 border-amber-600 dark:bg-amber-500 dark:border-amber-500' : 'border-amber-400 dark:border-amber-600 bg-white dark:bg-slate-800'}`}>
+              {form.hasPassedGate3 && <span className="text-white text-xs font-bold">✓</span>}
+            </div>
+            <span className="font-semibold">We have successfully passed Gate 3</span>
+          </button>
+          <button
+            onClick={() => dispatch({ type: 'UPDATE_FIELD', field: 'hasPID', value: !form.hasPID })}
+            className="flex items-center gap-3 w-full text-left focus:outline-none"
+          >
+            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors
+              ${form.hasPID ? 'bg-amber-600 border-amber-600 dark:bg-amber-500 dark:border-amber-500' : 'border-amber-400 dark:border-amber-600 bg-white dark:bg-slate-800'}`}>
+              {form.hasPID && <span className="text-white text-xs font-bold">✓</span>}
+            </div>
+            <span className="font-semibold">We have a documented PID or Business Case</span>
+          </button>
+        </div>
       </div>
       <Field label="Executive sponsor name" required>
         <TextInput value={form.executiveSponsorName} onChange={upd('executiveSponsorName')} placeholder="Full name of the executive sponsor" />
@@ -437,8 +481,57 @@ function AIGate({ form, dispatch }: { form: FormData; dispatch: React.Dispatch<A
   );
 }
 
-function OutcomeScreen({ form, route }: { form: FormData; route: 'ai-steering' | 'tpmo' }) {
+function OutcomeScreen({ form, route, rejectionReason }: { form: FormData; route: 'ai-steering' | 'tpmo' | 'rejected', rejectionReason?: string }) {
   const isAI = route === 'ai-steering';
+  const isRejected = route === 'rejected';
+
+  if (isRejected) {
+    return (
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+        <div className="rounded-2xl p-8 border-2 border-red-400 bg-red-50 dark:border-red-600 dark:bg-red-900/10 space-y-4">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-md bg-red-500">
+              <span className="text-white text-xl">✗</span>
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-red-700 dark:text-red-400">
+                Initiative Rejected by OneBridge Triage
+              </h2>
+              <p className="text-slate-700 dark:text-slate-300 mt-2 leading-relaxed font-medium">
+                {rejectionReason}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-navy dark:bg-slate-900 text-white rounded-2xl p-6 space-y-4">
+          <h3 className="font-bold text-red-400 text-lg">What happens next</h3>
+          <p className="text-sm text-slate-300 leading-relaxed">
+            Your initiative does not meet the necessary threshold for global OneBridge review. 
+            Do not submit this initiative to the central Transformation Queue at this time. 
+            <br/><br/>
+            Instead, please follow the local PMO route within your sector or function to progress this activity, or revisit the requirements and return once the maturity or scope criteria have been met.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-4">
+          <button
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 active:scale-95"
+          >
+            Start Over
+          </button>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium px-6 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
+          >
+            Return to AI Front Door
+          </Link>
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       {/* Route verdict */}
@@ -456,6 +549,9 @@ function OutcomeScreen({ form, route }: { form: FormData; route: 'ai-steering' |
                 ? 'Your initiative has been identified as involving AI and has been routed to Peter P and the AI Steering Committee for governance review. An automated acknowledgement will be sent confirming the review timeline.'
                 : 'Your initiative has been entered into the Global TPMO pipeline for quarterly review and ELT prioritisation. An automated acknowledgement will be sent confirming the next review window.'}
             </p>
+            <div className={`mt-4 inline-flex px-3 py-1.5 rounded-lg text-sm font-semibold tracking-wide ${isAI ? 'bg-teal/10 border border-teal/30 text-teal-800 dark:bg-teal/20 dark:text-teal-200' : 'bg-purple-100 border border-purple-300 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'}`}>
+              {isAI ? 'Queue: AI Initiatives Queue / Support: AIDEX' : 'Queue: Transformation Queue'}
+            </div>
           </div>
         </div>
       </div>
@@ -540,14 +636,46 @@ function SectionHeader({ number, title, subtitle }: { number: number; title: str
 
 function canAdvance(section: Section, form: FormData): boolean {
   switch (section) {
-    case 1: return !!(form.initiativeTitle && form.initiativeOverview && form.strategicPriorities && form.scopeAndBusinessImpact);
+    case 1: return !!(form.initiativeTitle && form.initiativeOverview && form.strategicPriorities && form.scopeAndBusinessImpact && form.scopeLevel);
     case 2: return !!(form.totalInvestmentEstimate && form.fundingAvailability && form.financialBenefits && form.benefitType);
     case 3: return !!(form.regulatoryEthicalCyberRisks && form.operationalDisruptionRisk && form.changeManagementImpact);
     case 4: return !!(form.deliveryPlan && form.businessCaseSummary && form.deliverablesDurationPhasing && form.kpisLongTermRoi);
-    case 5: return !!(form.executiveSponsorName && form.executiveSponsorRole && form.sponsorEndorsementConfirmed);
+    case 5: return !!(form.executiveSponsorName && form.executiveSponsorRole && form.sponsorEndorsementConfirmed && form.hasPassedGate3 && form.hasPID);
     case 'gate': return form.involvesAI === 'yes' || form.involvesAI === 'no';
     default: return true;
   }
+}
+
+// ─── Triage Logic ─────────────────────────────────────────────────────────────
+
+function onebridgeTriage(form: FormData): { status: 'ai-steering' | 'tpmo' | 'rejected', reason?: string } {
+  // 1. Maturity Gate
+  if (!form.hasPassedGate3 || !form.hasPID) {
+    return { status: 'rejected', reason: "REJECTED: Initiatives must pass Gate 3 and have a PID/Business Case." };
+  }
+
+  // 2. AI Detection
+  const aiKeywords = ['ai', 'machine learning', 'ml', 'generative ai', 'genai', 'llm'];
+  const desc = (form.initiativeTitle + ' ' + form.initiativeOverview).toLowerCase();
+  const isAutoAi = aiKeywords.some(key => desc.includes(key));
+  const isAi = form.involvesAI === 'yes' || isAutoAi;
+
+  if (isAi) {
+    return { status: 'ai-steering' };
+  }
+
+  // 3. Scope and Strategic Alignment
+  if (form.scopeLevel !== 'global') {
+    return { status: 'rejected', reason: "REJECTED: Non-AI initiatives must be Global Transformation level." };
+  }
+
+  // 4. Value Filter
+  const validBenefits = ['overhead-efficiency', 'gross-margin', 'both'];
+  if (!validBenefits.includes(form.benefitType)) {
+    return { status: 'rejected', reason: "REJECTED: Initiative must benefit Overhead Efficiency or Gross Margin." };
+  }
+
+  return { status: 'tpmo' };
 }
 
 // ─── Nav buttons ──────────────────────────────────────────────────────────────
@@ -559,7 +687,8 @@ function NavButtons({ section, form, dispatch }: { section: Section; form: FormD
 
   const handleNext = () => {
     if (isGate) {
-      dispatch({ type: 'SET_ROUTE', route: form.involvesAI === 'yes' ? 'ai-steering' : 'tpmo' });
+      const triage = onebridgeTriage(form);
+      dispatch({ type: 'SET_ROUTE', route: triage.status, reason: triage.reason });
     } else {
       dispatch({ type: 'NEXT_SECTION' });
     }
@@ -596,10 +725,11 @@ export default function OneBridgePage() {
     currentSection: 1,
     form: EMPTY_FORM,
     route: null,
+    rejectionReason: '',
     submitted: false,
   });
 
-  const { currentSection, form, route } = state;
+  const { currentSection, form, route, rejectionReason } = state;
 
   return (
     <div className="max-w-3xl mx-auto py-10 px-4 pb-24">
@@ -642,7 +772,7 @@ export default function OneBridgePage() {
           {currentSection === 4 && <Section4 form={form} dispatch={dispatch} />}
           {currentSection === 5 && <Section5 form={form} dispatch={dispatch} />}
           {currentSection === 'gate' && <AIGate form={form} dispatch={dispatch} />}
-          {currentSection === 'outcome' && route && <OutcomeScreen form={form} route={route} />}
+          {currentSection === 'outcome' && route && <OutcomeScreen form={form} route={route} rejectionReason={rejectionReason} />}
           <NavButtons section={currentSection} form={form} dispatch={dispatch} />
         </motion.div>
       </AnimatePresence>
