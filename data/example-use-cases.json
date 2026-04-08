@@ -1,0 +1,102 @@
+[
+  {
+    "id": "draft-internal",
+    "name": "Drafting internal notes, meeting summaries, or routine communications",
+    "value": "Saves time, improves consistency",
+    "tier": 1,
+    "pathway": "A",
+    "fit": "good",
+    "keyConcern": "Human review still required",
+    "factors": { "dataSensitivity": "low", "decisionInfluence": "low", "audienceReliance": "low", "autonomyAction": "low", "domainSensitivity": "low" }
+  },
+  {
+    "id": "summarise-reports",
+    "name": "Summarising approved engineering reports for internal briefing packs",
+    "value": "Faster synthesis of long material",
+    "tier": [1, 2],
+    "pathway": ["A", "B"],
+    "fit": "good",
+    "keyConcern": "Source control and accuracy checking",
+    "factors": { "dataSensitivity": ["low", "moderate"], "decisionInfluence": "low", "audienceReliance": "low", "autonomyAction": "low", "domainSensitivity": "low" }
+  },
+  {
+    "id": "code-assistance",
+    "name": "Code assistance, test generation, or documentation support in approved environments",
+    "value": "Engineering productivity",
+    "tier": [1, 2],
+    "pathway": ["A", "B"],
+    "fit": "good",
+    "keyConcern": "Code repository and environment controls",
+    "factors": { "dataSensitivity": "low", "decisionInfluence": "low", "audienceReliance": "low", "autonomyAction": "low", "domainSensitivity": "low" }
+  },
+  {
+    "id": "ticket-triage",
+    "name": "Classifying and tagging incoming support tickets for triage",
+    "value": "Improves retrieval and metadata quality",
+    "tier": 2,
+    "pathway": "B",
+    "fit": "good",
+    "keyConcern": "Operational dependency and monitoring",
+    "factors": { "dataSensitivity": "moderate", "decisionInfluence": "moderate", "audienceReliance": "moderate", "autonomyAction": "low", "domainSensitivity": "low" }
+  },
+  {
+    "id": "maintenance-priorities",
+    "name": "AI proposing maintenance priorities for internal teams",
+    "value": "Helps prioritisation and triage",
+    "tier": [2, 3],
+    "pathway": ["B", "C"],
+    "fit": "borderline",
+    "keyConcern": "Decision influence and data quality",
+    "factors": { "dataSensitivity": "moderate", "decisionInfluence": "moderate", "audienceReliance": "moderate", "autonomyAction": "moderate", "domainSensitivity": "low" }
+  },
+  {
+    "id": "customer-deliverable",
+    "name": "AI drafting sections of a customer deliverable, reviewed and owned by a human",
+    "value": "External speed and scale",
+    "tier": 3,
+    "pathway": "C",
+    "fit": "possible-with-control",
+    "keyConcern": "External reliance and disclosure",
+    "factors": { "dataSensitivity": "moderate", "decisionInfluence": "moderate", "audienceReliance": "high", "autonomyAction": "low", "domainSensitivity": "low" }
+  },
+  {
+    "id": "agent-records",
+    "name": "AI agent updating records and triggering routine low-risk workflow steps",
+    "value": "Automation of real actions",
+    "tier": 3,
+    "pathway": "C",
+    "fit": "possible-controlled",
+    "keyConcern": "Autonomy and rollback",
+    "factors": { "dataSensitivity": "moderate", "decisionInfluence": "moderate", "audienceReliance": "moderate", "autonomyAction": "high", "domainSensitivity": "low" }
+  },
+  {
+    "id": "job-scoring",
+    "name": "AI scoring job applicants or recommending disciplinary outcomes",
+    "value": "Workforce efficiency",
+    "tier": [3, 4],
+    "pathway": ["C", "D"],
+    "fit": "restricted",
+    "keyConcern": "Fairness, legal, privacy, workforce implications",
+    "factors": { "dataSensitivity": "high", "decisionInfluence": "high", "audienceReliance": "moderate", "autonomyAction": "moderate", "domainSensitivity": "high" }
+  },
+  {
+    "id": "classified-unapproved",
+    "name": "Using AI on classified or customer-restricted information in an unapproved tool",
+    "value": "N/A",
+    "tier": null,
+    "pathway": null,
+    "fit": "prohibited",
+    "keyConcern": "Immediate information-handling breach",
+    "factors": { "dataSensitivity": "high" }
+  },
+  {
+    "id": "safety-critical",
+    "name": "AI influencing safety-critical decisions with no proven assurance case",
+    "value": "N/A",
+    "tier": 4,
+    "pathway": "D",
+    "fit": "prohibited-or-stop",
+    "keyConcern": "Critical consequence, unproven assurance",
+    "factors": { "dataSensitivity": "high", "decisionInfluence": "high", "autonomyAction": "high", "domainSensitivity": "high" }
+  }
+]

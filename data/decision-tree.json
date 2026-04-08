@@ -1,0 +1,250 @@
+{
+  "nodes": [
+    {
+      "id": "entry",
+      "question": "What brings you to the AI Front Door today?",
+      "options": [
+        {
+          "id": "new-proposal",
+          "label": "I want to create or propose a new AI use case",
+          "value": "new-proposal",
+          "nextNodeId": "why-ai"
+        },
+        {
+          "id": "shape-idea",
+          "label": "I have an idea and need help shaping it",
+          "value": "shape-idea",
+          "nextNodeId": "why-ai"
+        },
+        {
+          "id": "explore",
+          "label": "I want to understand what AI projects are active",
+          "value": "explore",
+          "nextNodeId": "RESULTS"
+        },
+        {
+          "id": "report-concern",
+          "label": "I need to report a concern or incident",
+          "value": "report-concern",
+          "nextNodeId": "RESULTS"
+        }
+      ]
+    },
+    {
+      "id": "why-ai",
+      "question": "Why is AI the right approach for this task?",
+      "helpText": "We ask this to ensure AI is being used where it genuinely adds value — not just because it's available. The manual calls this the 'Why AI?' assessment.",
+      "manualReference": "Section 3.3",
+      "options": [
+        {
+          "id": "clear-advantage",
+          "label": "There's a clear problem and AI outperforms manual or conventional approaches",
+          "value": "clear-advantage",
+          "nextNodeId": "data-sensitivity"
+        },
+        {
+          "id": "exploring",
+          "label": "We're exploring whether AI could add value",
+          "value": "exploring",
+          "nextNodeId": "data-sensitivity"
+        },
+        {
+          "id": "not-sure",
+          "label": "Not sure — someone suggested using AI",
+          "value": "not-sure",
+          "nextNodeId": "data-sensitivity"
+        }
+      ]
+    },
+    {
+      "id": "data-sensitivity",
+      "question": "What kind of information will this use case handle?",
+      "helpText": "This determines the data governance and security controls required. Think about both the inputs the AI will receive and the outputs it will produce.",
+      "manualReference": "Section 2.2 — Data Sensitivity",
+      "options": [
+        {
+          "id": "public-internal",
+          "label": "Public information or ordinary internal data",
+          "value": "public-internal",
+          "nextNodeId": "decision-influence",
+          "classificationImpact": {
+            "factor": "dataSensitivity",
+            "level": "low"
+          }
+        },
+        {
+          "id": "controlled",
+          "label": "Controlled internal information with limited sensitivity",
+          "value": "controlled",
+          "nextNodeId": "decision-influence",
+          "classificationImpact": {
+            "factor": "dataSensitivity",
+            "level": "moderate"
+          }
+        },
+        {
+          "id": "sensitive",
+          "label": "Personal data, special category, classified, export-controlled, customer-restricted, or legally privileged",
+          "value": "sensitive",
+          "nextNodeId": "decision-influence",
+          "classificationImpact": {
+            "factor": "dataSensitivity",
+            "level": "high"
+          }
+        }
+      ]
+    },
+    {
+      "id": "decision-influence",
+      "question": "How much influence will the AI have on decisions or outcomes?",
+      "helpText": "Consider the worst case — not just the intended use, but what happens if someone treats AI output as definitive.",
+      "manualReference": "Section 2.2 — Decision Influence",
+      "options": [
+        {
+          "id": "support-only",
+          "label": "Drafting, research, or admin support only",
+          "value": "support-only",
+          "nextNodeId": "audience-reliance",
+          "classificationImpact": {
+            "factor": "decisionInfluence",
+            "level": "low"
+          }
+        },
+        {
+          "id": "informs-decisions",
+          "label": "Supports internal decisions but does not decide or act",
+          "value": "informs-decisions",
+          "nextNodeId": "audience-reliance",
+          "classificationImpact": {
+            "factor": "decisionInfluence",
+            "level": "moderate"
+          }
+        },
+        {
+          "id": "determines-outcomes",
+          "label": "Materially shapes or determines operational, customer, workforce, safety, security, legal, or financial outcomes",
+          "value": "determines-outcomes",
+          "nextNodeId": "audience-reliance",
+          "classificationImpact": {
+            "factor": "decisionInfluence",
+            "level": "high"
+          }
+        }
+      ]
+    },
+    {
+      "id": "audience-reliance",
+      "question": "Who will use or rely on the AI's outputs?",
+      "helpText": "External reliance changes the approval pathway significantly. If customers or external parties will see or depend on the output, that triggers additional controls.",
+      "manualReference": "Section 2.2 — Audience and Reliance",
+      "options": [
+        {
+          "id": "internal-aid",
+          "label": "Internal working aid — only I or my immediate team will use it",
+          "value": "internal-aid",
+          "nextNodeId": "autonomy-action",
+          "classificationImpact": {
+            "factor": "audienceReliance",
+            "level": "low"
+          }
+        },
+        {
+          "id": "internal-ops",
+          "label": "Internal operational teams rely on it for their work",
+          "value": "internal-ops",
+          "nextNodeId": "autonomy-action",
+          "classificationImpact": {
+            "factor": "audienceReliance",
+            "level": "moderate"
+          }
+        },
+        {
+          "id": "external",
+          "label": "Customer-facing, externally relied upon, or embedded in a deliverable",
+          "value": "external",
+          "nextNodeId": "autonomy-action",
+          "classificationImpact": {
+            "factor": "audienceReliance",
+            "level": "high"
+          }
+        }
+      ]
+    },
+    {
+      "id": "autonomy-action",
+      "question": "What can the AI system actually do?",
+      "helpText": "This assesses the autonomy level. A system that can take actions — sending emails, modifying records, triggering workflows — needs stronger controls than one that only drafts content for human review.",
+      "manualReference": "Section 2.2 — Autonomy and Action Authority; Section 3.4",
+      "options": [
+        {
+          "id": "content-for-review",
+          "label": "Generates content, suggestions, or analysis for human review before any action",
+          "value": "content-for-review",
+          "nextNodeId": "domain-sensitivity",
+          "classificationImpact": {
+            "factor": "autonomyAction",
+            "level": "low"
+          }
+        },
+        {
+          "id": "bounded-actions",
+          "label": "Can recommend or trigger bounded steps, but with human checkpoints",
+          "value": "bounded-actions",
+          "nextNodeId": "domain-sensitivity",
+          "classificationImpact": {
+            "factor": "autonomyAction",
+            "level": "moderate"
+          }
+        },
+        {
+          "id": "autonomous-actions",
+          "label": "Can act on systems, send communications, change or delete data, or self-initiate actions",
+          "value": "autonomous-actions",
+          "nextNodeId": "domain-sensitivity",
+          "classificationImpact": {
+            "factor": "autonomyAction",
+            "level": "high"
+          }
+        }
+      ]
+    },
+    {
+      "id": "domain-sensitivity",
+      "question": "Does this involve any specialist or regulated domain?",
+      "helpText": "Certain domains require additional specialist review regardless of other factors. If you're unsure whether your domain qualifies, select the middle option and AIDEX will advise.",
+      "manualReference": "Section 2.2 — Domain Sensitivity",
+      "options": [
+        {
+          "id": "no-trigger",
+          "label": "No — standard business domain with no special regulatory or safety considerations",
+          "value": "no-trigger",
+          "nextNodeId": "RESULTS",
+          "classificationImpact": {
+            "factor": "domainSensitivity",
+            "level": "low"
+          }
+        },
+        {
+          "id": "operationally-relevant",
+          "label": "Operationally relevant but not in a restricted or regulated domain",
+          "value": "operationally-relevant",
+          "nextNodeId": "RESULTS",
+          "classificationImpact": {
+            "factor": "domainSensitivity",
+            "level": "moderate"
+          }
+        },
+        {
+          "id": "restricted-domain",
+          "label": "Safety-critical, defence, security-sensitive, regulated, workforce decisioning, or mission-relevant",
+          "value": "restricted-domain",
+          "nextNodeId": "RESULTS",
+          "classificationImpact": {
+            "factor": "domainSensitivity",
+            "level": "high"
+          }
+        }
+      ]
+    }
+  ]
+}
