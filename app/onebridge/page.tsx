@@ -488,14 +488,14 @@ function OutcomeScreen({ form, route, rejectionReason }: { form: FormData; route
   if (isRejected) {
     return (
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-        <div className="rounded-2xl p-8 border-2 border-red-400 bg-red-50 dark:border-red-600 dark:bg-red-900/10 space-y-4">
+        <div className={`rounded-2xl p-8 border-2 ${rejectionReason?.includes('maturity') ? 'border-amber-400 bg-amber-50 dark:border-amber-600 dark:bg-amber-900/10' : 'border-red-400 bg-red-50 dark:border-red-600 dark:bg-red-900/10'} space-y-4`}>
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-md bg-red-500">
-              <span className="text-white text-xl">✗</span>
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 shadow-md ${rejectionReason?.includes('maturity') ? 'bg-amber-500' : 'bg-red-500'}`}>
+              <span className="text-white text-xl">!</span>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-red-700 dark:text-red-400">
-                Initiative Rejected by OneBridge Triage
+              <h2 className={`text-2xl font-bold ${rejectionReason?.includes('maturity') ? 'text-amber-700 dark:text-amber-400' : 'text-red-700 dark:text-red-400'}`}>
+                {rejectionReason?.includes('maturity') ? 'Initiative needs further development' : 'Initiative Rejected by OneBridge Triage'}
               </h2>
               <p className="text-slate-700 dark:text-slate-300 mt-2 leading-relaxed font-medium">
                 {rejectionReason}
@@ -505,22 +505,36 @@ function OutcomeScreen({ form, route, rejectionReason }: { form: FormData; route
         </div>
 
         <div className="bg-navy dark:bg-slate-900 text-white rounded-2xl p-6 space-y-4">
-          <h3 className="font-bold text-red-400 text-lg">What happens next</h3>
+          <h3 className={`font-bold text-lg ${rejectionReason?.includes('maturity') ? 'text-teal-light' : 'text-red-400'}`}>
+            {rejectionReason?.includes('maturity') ? 'Support is available' : 'What happens next'}
+          </h3>
           <p className="text-sm text-slate-300 leading-relaxed">
-            Your initiative does not meet the necessary threshold for global OneBridge review. 
-            Do not submit this initiative to the central Transformation Queue at this time. 
+            {rejectionReason?.includes('maturity') 
+              ? 'Your initiative does not yet meet the Gate 3 maturity requirements for global OneBridge review. We have a dedicated IT Pipeline process to help you mature your idea, document the business case, and engage with the right stakeholders.'
+              : 'Your initiative does not meet the necessary threshold for global OneBridge review. Do not submit this initiative to the central Transformation Queue at this time.'}
             <br/><br/>
-            Instead, please follow the local PMO route within your sector or function to progress this activity, or revisit the requirements and return once the maturity or scope criteria have been met.
+            {rejectionReason?.includes('maturity')
+              ? 'Use the IT Pipeline tracker to capture your progress and notify an IT Business Partner who can provide direct support.'
+              : 'Instead, please follow the local PMO route within your sector or function to progress this activity, or revisit the requirements and return once the maturity or scope criteria have been met.'}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-4">
-          <button
-            onClick={() => window.location.reload()}
-            className="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 active:scale-95"
-          >
-            Start Over
-          </button>
+          {rejectionReason?.includes('maturity') ? (
+            <Link
+              href="/it-pipeline"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 active:scale-95"
+            >
+              Develop initiative in IT Pipeline →
+            </Link>
+          ) : (
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 active:scale-95"
+            >
+              Start Over
+            </button>
+          )}
           <Link
             href="/"
             className="inline-flex items-center gap-2 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 font-medium px-6 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2"
@@ -604,36 +618,23 @@ function OutcomeScreen({ form, route, rejectionReason }: { form: FormData; route
             onClick={() => {
                 const mapping = generateAIMapping(form);
                 sessionStorage.setItem('ai-front-door-prefill', JSON.stringify(mapping));
-                // Also persist the full OneBridge form so the PDF can include it
-                sessionStorage.setItem('onebridge-submission', JSON.stringify({
-                  initiativeTitle: form.initiativeTitle,
-                  initiativeOverview: form.initiativeOverview,
-                  strategicPriorities: form.strategicPriorities,
-                  scopeLevel: form.scopeLevel,
-                  scopeAndBusinessImpact: form.scopeAndBusinessImpact,
-                  totalInvestmentEstimate: form.totalInvestmentEstimate,
-                  benefitType: form.benefitType,
-                  financialBenefits: form.financialBenefits,
-                  nonFinancialBenefits: form.nonFinancialBenefits,
-                  regulatoryEthicalCyberRisks: form.regulatoryEthicalCyberRisks,
-                  deliveryPlan: form.deliveryPlan,
-                  kpisLongTermRoi: form.kpisLongTermRoi,
-                  executiveSponsorName: form.executiveSponsorName,
-                  executiveSponsorRole: form.executiveSponsorRole,
-                }));
-                window.location.href = '/assess';
+                sessionStorage.setItem('onebridge-submission-data', JSON.stringify(form));
+                window.location.href = '/aidex';
             }}
             className="inline-flex items-center gap-2 bg-teal hover:bg-teal-light text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2 active:scale-95"
           >
-            Continue to AI Assessment →
+            Continue to AIDEX Submission →
           </button>
         ) : (
-          <Link
-            href="/"
+          <button
+            onClick={() => {
+                sessionStorage.setItem('onebridge-submission-data', JSON.stringify(form));
+                window.location.href = '/tpmo';
+            }}
             className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold px-6 py-3 rounded-xl shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2 active:scale-95"
           >
-            Return to Dashboard
-          </Link>
+            Continue to TPMO Intake →
+          </button>
         )}
         <button
           onClick={() => window.print()}
@@ -681,7 +682,7 @@ function canAdvance(section: Section, form: FormData): boolean {
 function onebridgeTriage(form: FormData): { status: 'ai-steering' | 'tpmo' | 'rejected', reason?: string } {
   // 1. Maturity Gate
   if (!form.hasPassedGate3 || !form.hasPID) {
-    return { status: 'rejected', reason: "REJECTED: Initiatives must pass Gate 3 and have a PID/Business Case." };
+    return { status: 'rejected', reason: "This initiative has low maturity. All initiatives must pass Gate 3 and have a documented PID or business case before central transformation review." };
   }
 
   // 2. AI Detection
@@ -696,13 +697,13 @@ function onebridgeTriage(form: FormData): { status: 'ai-steering' | 'tpmo' | 're
 
   // 3. Scope and Strategic Alignment
   if (form.scopeLevel !== 'global') {
-    return { status: 'rejected', reason: "REJECTED: Non-AI initiatives must be Global Transformation level." };
+    return { status: 'rejected', reason: "This initiative is local/sector in scope. Non-AI initiatives must have reach a global transformation threshold for central review." };
   }
 
   // 4. Value Filter
   const validBenefits = ['overhead-efficiency', 'gross-margin', 'both'];
   if (!validBenefits.includes(form.benefitType)) {
-    return { status: 'rejected', reason: "REJECTED: Initiative must benefit Overhead Efficiency or Gross Margin." };
+    return { status: 'rejected', reason: "The primary benefit type is not currently aligned with central priorities. Initiatives must deliver against overhead efficiency or gross margin targets." };
   }
 
   return { status: 'tpmo' };

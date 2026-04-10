@@ -57,18 +57,18 @@ export default function Home() {
         {/* Featured Card - OneBridge */}
         <motion.div variants={item} initial="hidden" animate="show" className="w-full" transition={{ delay: 0.1 }}>
             <Link 
-              href="/onebridge" 
+              href="/routing-selection" 
               className="flex flex-col md:flex-row items-center gap-6 bg-white dark:bg-slate-800 rounded-xl border border-blue-200 dark:border-blue-900/50 p-8 shadow-xl hover:shadow-2xl hover:-translate-y-1 hover:border-blue-500 transition-all duration-300 group focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900 active:scale-[0.98]"
             >
               <div className="w-20 h-20 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 shrink-0 group-hover:scale-105 group-hover:bg-blue-500 group-hover:text-white transition-all duration-300">
                  <ArrowRightLeft className="w-10 h-10" aria-hidden="true" />
               </div>
               <div className="flex-1 text-center md:text-left">
-                <h2 className="text-2xl md:text-3xl font-bold text-navy dark:text-white mb-2">Step 1: OneBridge Classification</h2>
-                <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed max-w-3xl">Required first step for all Transformation and AI Initiatives. Answer a few questions to find your execution route, and automatically map your operational characteristics into the AI Assessment.</p>
+                <h2 className="text-2xl md:text-3xl font-bold text-navy dark:text-white mb-2">Initiative Routing & Intake</h2>
+                <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed max-w-3xl">Required starting point for all early-stage ideas, AI proposals, and mature transformation initiatives. Answer a few questions to find your execution route and access the correct support pipeline.</p>
               </div>
               <div className="hidden md:flex shrink-0 items-center justify-center">
-                 <div className="bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md group-hover:bg-blue-600 transition-colors">Start routing →</div>
+                 <div className="bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-md group-hover:bg-blue-600 transition-colors">Route my initiative →</div>
               </div>
             </Link>
         </motion.div>
